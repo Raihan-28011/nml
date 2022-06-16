@@ -14,7 +14,7 @@ NML is a markup language, which generates efficient HTML files.
             [p This is a subsection paragraph]
 ```
 
-# Contributors
-* [Mahfuja Yesmin Preety](https:/github.com/preety)
-* [Nejum Akter](https:/github.com/nejum)
+# Team Members
+* [Mahfuja Yesmin Preety](https:/github.com/preetu10)
+* [Nejum Akter](https:/github.com/nejum05)
 * [Raihan Kabir](https:/github.com/Raihan-28011)
