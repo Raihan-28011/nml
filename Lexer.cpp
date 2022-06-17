@@ -17,14 +17,17 @@ void Lexer::tokenize() {
             case ']':
                 _tokens.push_back(Token{TOKEN_RSQBRACE, "]"});
                 break;
-            case 'p':
-                _tokens.push_back(Token{TOKEN_PARA, "p"});
-                break;
             default:
             {
                 std::string s = "";
-                string_token(s, c);
-                _tokens.push_back(Token{TOKEN_STRING, std::move(s)});
+                read_word(s, c);
+                if (check_for_tag_token(s)) {
+                    _tokens.push_back(tag_token(s));
+                } else {
+                    c = next_char();
+                    extract_string(s, c);
+                    _tokens.push_back(Token{TOKEN_STRING, std::move(s)});
+                }
                 break;
             }
         }
@@ -49,7 +52,7 @@ char Lexer::next_char() {
 }
 
 void Lexer::skip_whitespace() {
-    while (std::isspace(peek_char()))
+    while (std::isspace(peek_char()) && peek_char() != std::char_traits<char>::eof())
         next_char();
 }
 
@@ -59,13 +62,15 @@ char Lexer::peek_char() {
     return _file_text.at(_findex);
 }
 
-void Lexer::string_token(std::string &s, char c) {
+void Lexer::extract_string(std::string &s, char c) {
     while (c != std::char_traits<char>::eof() &&
            c >= 0 && c <= 127 && c != '[' && c != ']') { // check all ascii characters
         s += c;
         c = next_char();
     }
-    putback_char(); // we have read a character that we want to putback
+
+    if (c != std::char_traits<char>::eof())
+        putback_char(); // we have read a character that we want to putback
 }
 
 void Lexer::putback_char() {
@@ -78,4 +83,37 @@ void Lexer::putback_char() {
 void Lexer::print() {
     for (auto const &i: _tokens)
         i.print(), std::cout << '\n';
+}
+
+void Lexer::read_word(std::string &s, char c) {
+    while (c != std::char_traits<char>::eof() &&
+           !std::isspace(c)) {
+        s += c;
+        c = next_char();
+    }
+
+    if (c != std::char_traits<char>::eof())
+        putback_char();
+}
+
+bool Lexer::check_for_tag_token(std::string &s) {
+    switch (s[0]) {
+        case 'p':
+            if (s.length() == 1)
+                return true;
+            break;
+    }
+    return false;
+}
+
+Token Lexer::tag_token(std::string &s) {
+    TokenType t = TOKEN_EOF;
+    switch (s[0]) {
+        case 'p':
+            if (s.length() == 1)
+                t = TOKEN_PARA;
+            break;
+    }
+
+    return Token{t, std::move(s)};
 }
