@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Lexer.h"
+#include "Parser.h"
 #include <fstream>
 
 void read(char const *f, std::string &s) {
@@ -13,17 +13,16 @@ void read(char const *f, std::string &s) {
     buf[f_length] = '\0';
     file.close();
     s.append(buf, f_length);
- //   s.copy(buf, f_length);
-
     delete[] buf;
 }
 
 int main(int argc, char **argv) {
-    std::cout << "Hello, World!" << std::endl;
-
     std::string s{};
     read(argv[1], s);
     Lexer lex(std::move(s));
-    lex.print();
+    //lex.print(); // For debug purpose
+
+    Parser parser(lex, std::string{argv[1]});
+    parser.parse();
     return 0;
 }

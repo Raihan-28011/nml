@@ -119,3 +119,9 @@ Token Lexer::tag_token(std::string &s) {
     TokenType t = known_tokens[s];
     return Token{t, std::move(s)};
 }
+
+Token const &Lexer::peek_token() {
+    if (_tindex >= _tokens.size())
+        return eof_token;
+    return _tokens.at(_tindex);
+}

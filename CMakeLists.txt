@@ -3,4 +3,4 @@ project(nml)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(nml main.cpp Token.cpp Token.h Lexer.cpp Lexer.h)
+add_executable(nml main.cpp Token.cpp Token.h Lexer.cpp Lexer.h Parser.cpp Parser.h Generator.cpp Generator.h)

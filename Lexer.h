@@ -8,9 +8,10 @@
 class Lexer {
 public:
     Lexer() = default;
-    Lexer(std::string &&file_text);
+    explicit Lexer(std::string &&file_text);
 
     Token const &next_token();  // Parser will use this function. You have to define it
+    Token const &peek_token();  // Don't increment the _tindex, just return the next token
     void print();  // For debugging purpose, I have defined it. You will also define it
 private:
     // Helper functions. Other class can't access these

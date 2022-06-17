@@ -24,6 +24,13 @@ public:
     Token(TokenType type, std::string &&tok);
 
     void print() const;
+    TokenType type() const {
+        return _type;
+    }
+
+    std::string const &tok_text() const {
+        return _tok;
+    }
 private:
     TokenType _type{TOKEN_EOF};
     std::string _tok;
