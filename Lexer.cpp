@@ -17,6 +17,15 @@ void Lexer::tokenize() {
             case ']':
                 _tokens.push_back(Token{TOKEN_RSQBRACE, "]"});
                 break;
+            case '*':
+                _tokens.push_back(Token{TOKEN_STAR, "*"});
+                break;
+            case '=':
+                _tokens.push_back(Token{TOKEN_EQUAL, "="});
+                break;
+            case ',':
+                _tokens.push_back(Token{TOKEN_COMMA, ","});
+                break;
             default:
             {
                 std::string s = "";
@@ -64,7 +73,12 @@ char Lexer::peek_char() {
 
 void Lexer::extract_string(std::string &s, char c) {
     while (c != std::char_traits<char>::eof() &&
-           c >= 0 && c <= 127 && c != '[' && c != ']') { // check all ascii characters
+           c >= 0 && c <= 127 && c != '[' && c != ']' && c != ',') { // check all ascii characters
+        if (c == '\\') {
+            c = next_char();
+            if (c == std::char_traits<char>::eof())
+                return;
+        }
         s += c;
         c = next_char();
     }
@@ -87,7 +101,8 @@ void Lexer::print() {
 
 void Lexer::read_word(std::string &s, char c) {
     while (c != std::char_traits<char>::eof() &&
-           !std::isspace(c)) {
+           !std::isspace(c) && c != ',' && c != '*' &&
+           c != '=' && c != '[' && c != ']') {
         s += c;
         c = next_char();
     }
@@ -97,23 +112,10 @@ void Lexer::read_word(std::string &s, char c) {
 }
 
 bool Lexer::check_for_tag_token(std::string &s) {
-    switch (s[0]) {
-        case 'p':
-            if (s.length() == 1)
-                return true;
-            break;
-    }
-    return false;
+    return known_tokens.find(s) != known_tokens.end();
 }
 
 Token Lexer::tag_token(std::string &s) {
-    TokenType t = TOKEN_EOF;
-    switch (s[0]) {
-        case 'p':
-            if (s.length() == 1)
-                t = TOKEN_PARA;
-            break;
-    }
-
+    TokenType t = known_tokens[s];
     return Token{t, std::move(s)};
 }

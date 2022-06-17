@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Token.h"
+#include <unordered_map>
 
 class Lexer {
 public:
@@ -37,6 +38,23 @@ private:
     std::vector<Token>::size_type _tindex{0};  // Index for _tokens
 
     Token const eof_token{TOKEN_EOF, "EOF"};
+    std::unordered_map<std::string, TokenType> known_tokens {
+            {"p", TOKEN_PARA},
+            {"article", TOKEN_ARTICLE},
+            {"opt", TOKEN_OPT},
+            {"title", TOKEN_TITLE},
+            {"author", TOKEN_AUTHOR},
+            {"aff", TOKEN_AFF},
+            {"date", TOKEN_DATE},
+            {"sec", TOKEN_SEC},
+            {"b", TOKEN_BOLD},
+            {"i", TOKEN_ITALIC},
+            {"u", TOKEN_UNDERLINE},
+            {"ul", TOKEN_ULIST},
+            {"ol", TOKEN_OLIST},
+            {"item", TOKEN_ITEM},
+            {"style", TOKEN_STYLE},
+    };
 };
 
 
