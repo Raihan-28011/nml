@@ -90,7 +90,7 @@ AbstractBase::AbstractBase(Parent p)
 {
 }
 
-void AbstractBase::add_child(std::unique_ptr<AbstractBase> &&c) {
+void AbstractBase::add_child(std::shared_ptr<AbstractBase> &&c) {
     childs.push_back(std::move(c));
 }
 
@@ -102,7 +102,7 @@ std::string &AbstractBase::get_option(TokenType type) {
     return options[type];
 }
 
-std::unique_ptr<AbstractBase> dummyParent = std::unique_ptr<AbstractBase>();
+std::shared_ptr<AbstractBase> dummyParent = std::shared_ptr<AbstractBase>();
 std::string dummyText{};
 
 ArticleTag::ArticleTag()
@@ -125,8 +125,6 @@ void ArticleTag::generate(std::string &s, long long indent) {
     for (auto &i: childs)
         i->generate(s, indent+2);
 
-    generate_author_info(s, indent+2);
-
     s += "  </div>\n";
     s += "</body>\n";
     s += "</html>\n";
@@ -135,18 +133,63 @@ void ArticleTag::generate(std::string &s, long long indent) {
 void ArticleTag::generate_styles(std::string &s) {
     s += "  <style>\n";
 
-    s += "    .article {\n"
+    s += ".article {\n"
          "        width: 800px;\n"
          "        margin: auto;\n"
          "        font-family: Helvetica, Arial, sans-serif;\n"
-         "        font-size: 16px;\n"
          "        line-height: 20px;\n"
-         "        letter-spacing: 0.8px;\n"
-         "        word-spacing: 1px;\n"
+         "        letter-spacing: 0.5px;\n"
+         "        word-spacing: 1.2px;\n"
+         "        font-size: 16px;\n"
          "    }\n"
          "\n"
          "    .article h2 {\n"
          "        font-size: 30px;\n"
+         "    }\n"
+         "\n"
+         "    .articleTitle {\n"
+         "      margin-bottom: 30px;\n"
+         "    }\n"
+         "\n"
+         "    .section {\n"
+         "      line-height: 30px;\n"
+         "      letter-spacing: 0.5px;\n"
+         "      word-spacing: 1.2px;\n"
+         "      margin-bottom: 50px;\n"
+         "      font-size: 16px;\n"
+         "    }\n"
+         "\n"
+         "    .section h2 {\n"
+         "      font-size: 27px;\n"
+         "      margin-bottom: 10px;\n"
+         "    }\n"
+         "\n"
+         "    .section hr {\n"
+         "      margin-bottom: 20px;\n"
+         "      color: lightgray;\n"
+         "      background-color: lightgray;\n"
+         "      height: 1.5px;\n"
+         "      border: 0px;\n"
+         "    }\n"
+         "\n"
+         "    .codeblock {\n"
+         "      font-family: monospace, 'Courier New', Courier;\n"
+         "      line-height: 25px;\n"
+         "      font-size: 12px;\n"
+         "      padding: 5px 5px 5px 10px;\n"
+         "      background-color: #efeff5;\n"
+         "      color: black;\n"
+         "      min-height: 18px;\n"
+         "      margin-bottom: 20px;\n"
+         "    }\n"
+         "\n"
+         "    .codeblock pre {\n"
+         "      margin: 0px;\n"
+         "      padding: 0px;\n"
+         "    }\n"
+         "\n"
+         "    .section ul, li {\n"
+         "      margin-bottom: 3px;\n"
          "    }\n"
          "  </style>\n";
 }
@@ -173,19 +216,58 @@ TitleTag::TitleTag(Parent p)
 
 void TitleTag::generate(std::string &s, long long indent) {
     auto in = std::string(indent*2, ' ');
-    s += in + "<div>\n";
+    s += in + "<div class=\"articleTitle\">\n";
 
     s += std::string((indent+1)*2, ' ') + "<h2> ";
     s += title + " </h2>\n";
+
+    if (parent->tag_type() == NML_SEC)
+        s += "<hr>\n";
     /*for (auto &i: childs)
         i->generate(s, indent+1);*/
 
-    if (parent->get_option(TOKEN_AUTHOR) != "author" || parent->get_option(TOKEN_DATE) != "date")
-        return;
-    s += in + "</div>\n";;
+    if (parent->tag_type() == NML_ARTICLE) {
+        if (parent->get_option(TOKEN_AUTHOR) != "author" || parent->get_option(TOKEN_DATE) != "date") {
+            std::static_pointer_cast<ArticleTag>(parent)->generate_author_info(s, indent);
+            return;
+        }
+    }
+    s += in + "</div>\n";
 }
 
 void TitleTag::add_text(std::string const &s) {
     title = s;
 }
 
+SecTag::SecTag(Parent p)
+    : AbstractBase{p}
+{
+}
+
+void SecTag::generate(std::string &s, long long int indent) {
+    auto in = std::string(indent*2, ' ');
+    s += in + "<div class=\"section\">\n";
+
+    for (auto &i: childs)
+        i->generate(s, indent+1);
+
+    s += in + "</div>\n";
+}
+
+ParaTag::ParaTag(Parent parent)
+    : AbstractBase{parent}
+{
+}
+
+void ParaTag::generate(std::string &s, long long int indent) {
+    auto in = std::string(indent*2, ' ');
+    s += in + "<p>\n" + body + " ";
+    for (auto &i: childs)
+        i->generate(s, indent+1);
+
+    s += in + "</p>\n";
+}
+
+void ParaTag::add_text(const std::string &s) {
+    body = s;
+}

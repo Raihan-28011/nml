@@ -21,6 +21,7 @@ private:
     void parse_article_tag(int indent, Parent parent);
     void parse_title_tag(int indent, Parent parent);
     void parse_arg_tag(int indent, Parent parent);
+    void parse_sec_tag(int indent, Parent parent);
 
     void parse_para_tag(int indent, Parent parent);
     void parse_italic_tag(int indent);
@@ -31,7 +32,7 @@ private:
     std::string out_file{};
     std::array<void(Parser::*)(int, Parent), TOKEN_END> tag_parse_func{};
     Generator generator{};
-    std::unique_ptr<AbstractBase> docRoot{};
+    std::shared_ptr<AbstractBase> docRoot{};
     std::unordered_map<NmlTags, std::unordered_map<TokenType, std::string>> arguments {
             {NML_ARTICLE,{ {TOKEN_AUTHOR, "author"},
                                  {TOKEN_DATE, "date"}

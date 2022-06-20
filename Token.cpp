@@ -75,6 +75,9 @@ void Token::print() const {
         case TOKEN_CODE:
             std::cout << "TOKEN_CODE";
             break;
+        case TOKEN_MATH:
+            std::cout << "TOKEN_MATH";
+            break;
         case TOKEN_EOF:
             std::cout << "TOKEN_EOF";
             break;

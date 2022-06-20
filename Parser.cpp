@@ -7,6 +7,7 @@ Parser::Parser(Lexer &l, std::string s)
     tag_parse_func[TOKEN_ARTICLE] = &Parser::parse_article_tag;
     tag_parse_func[TOKEN_TITLE] = &Parser::parse_title_tag;
     tag_parse_func[TOKEN_ARG] = &Parser::parse_arg_tag;
+    tag_parse_func[TOKEN_SEC] = &Parser::parse_sec_tag;
 /*    tag_parse_func[TOKEN_ITALIC] = &Parser::parse_italic_tag;
     tag_parse_func[TOKEN_BOLD] = &Parser::parse_bold_tag;
     tag_parse_func[TOKEN_UNDERLINE] = &Parser::parse_underline_tag;*/
@@ -42,20 +43,23 @@ void Parser::parse_tag(int indent, Parent parent) {
 }
 
 void Parser::parse_para_tag(int indent, Parent parent) {
-    generator.generate_opening_tag(TOKEN_PARA, indent);
+    if (!parent) {
+        //error
+        return;
+    }
 
+    auto child = std::make_shared<ParaTag>(parent);
     auto t = lex.peek_token();
-    std::string body{};
-    while (t.type() != TOKEN_RSQBRACE && t.type() != TOKEN_EOF) {
-        lex.next_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
         switch (t.type()) {
             case TOKEN_STRING:
-                body.append(t.tok_text());
+                // TODO: handle strings outside paragraph tag
+                lex.next_token();
+                child->add_text(t.tok_text());
                 break;
             case TOKEN_LSQBRACE:
-                generator.generate_tag_body(body, indent+1);
-                body.clear();
-                parse_tag(indent + 1, parent);
+                lex.next_token();
+                parse_tag(indent+1, child);
                 break;
             default:
                 break;
@@ -65,11 +69,12 @@ void Parser::parse_para_tag(int indent, Parent parent) {
     }
 
     if (t.type() == TOKEN_EOF) {
-        // error;
-    } else if (t.type() == TOKEN_RSQBRACE) {
-        lex.next_token();
-        generator.generate_closing_tag(TOKEN_PARA, body, indent);
+        // error
+        return;
     }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
 }
 
 bool Parser::is_tag(TokenType t) {
@@ -96,7 +101,7 @@ void Parser::parse_article_tag(int indent, Parent parent) {
         return;
     }
 
-    docRoot = std::make_unique<ArticleTag>();
+    docRoot = std::make_shared<ArticleTag>();
     auto t = lex.peek_token();
     while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
         switch (t.type()) {
@@ -133,7 +138,7 @@ void Parser::parse_title_tag(int indent, Parent parent) {
         return;
     }
 
-    auto child = std::make_unique<TitleTag>(parent);
+    auto child = std::make_shared<TitleTag>(parent);
     auto t = lex.peek_token();
     while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
         switch (t.type()) {
@@ -203,4 +208,37 @@ void Parser::parse_arg_tag(int indent, Parent parent) {
 
     lex.next_token();
     parent->set_options(arguments[p_type]);
+}
+
+void Parser::parse_sec_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
+
+    auto child = std::make_shared<SecTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_STRING:
+                // TODO: handle strings outside paragraph tag
+                break;
+            case TOKEN_LSQBRACE:
+                lex.next_token();
+                parse_tag(indent+1, child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
 }

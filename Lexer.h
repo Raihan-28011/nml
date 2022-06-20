@@ -57,6 +57,7 @@ private:
             {"item", TOKEN_ITEM},
             {"style", TOKEN_STYLE},
             {"code", TOKEN_CODE},
+            {"math", TOKEN_MATH},
     };
 };
 
