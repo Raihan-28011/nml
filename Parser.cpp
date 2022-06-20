@@ -196,5 +196,11 @@ void Parser::parse_arg_tag(int indent, Parent parent) {
         t = lex.peek_token();
     }
 
+    if (t.type() == TOKEN_EOF) {
+        // Error
+        return;
+    }
+
+    lex.next_token();
     parent->set_options(arguments[p_type]);
 }

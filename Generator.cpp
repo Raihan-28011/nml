@@ -98,6 +98,10 @@ void AbstractBase::set_options(std::unordered_map<TokenType, std::string> &opt) 
     options = opt;
 }
 
+std::string &AbstractBase::get_option(TokenType type) {
+    return options[type];
+}
+
 std::unique_ptr<AbstractBase> dummyParent = std::unique_ptr<AbstractBase>();
 std::string dummyText{};
 
@@ -153,10 +157,12 @@ void ArticleTag::generate_author_info(std::string &s, long long indent) {
     bool b = author != "author";
     bool b1 = date != "date";
     if (b || b1) {
-        s += std::string(indent * 2, ' ') + "<p style=\"font-size: 14px;\"> "
+        auto in = std::string(indent * 2, ' ');
+        s += in + "  <p style=\"font-size: 14px;\"> "
              + (b ? author : "")
              + (b1 ? ", " + date : "")
-             + " </p>\n";
+             + " </p>\n"
+             + in + "</div>\n";
     }
 }
 
@@ -174,6 +180,8 @@ void TitleTag::generate(std::string &s, long long indent) {
     /*for (auto &i: childs)
         i->generate(s, indent+1);*/
 
+    if (parent->get_option(TOKEN_AUTHOR) != "author" || parent->get_option(TOKEN_DATE) != "date")
+        return;
     s += in + "</div>\n";;
 }
 

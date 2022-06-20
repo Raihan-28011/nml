@@ -54,6 +54,7 @@ public:
     void add_child(std::unique_ptr<AbstractBase> &&c);
     virtual NmlTags tag_type() = 0;
     void set_options(std::unordered_map<TokenType, std::string> &opt);
+    std::string &get_option(TokenType type);
 protected:
     std::vector<Child> childs{};
     Parent parent;
@@ -86,7 +87,7 @@ public:
         return NML_TITLE;
     }
 private:
-    std::string &title{dummyText};
+    std::string title{dummyText};
 };
 
 class ArgTag : public AbstractBase {
