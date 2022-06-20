@@ -43,7 +43,8 @@ enum NmlTags {
     NML_ITALIC,
     NML_UNDERLINE,
     NML_CODE,
-    NML_MATH
+    NML_MATH,
+    NML_CONTENT
 };
 
 class AbstractBase;
@@ -69,7 +70,6 @@ protected:
 };
 
 extern std::shared_ptr<AbstractBase> dummyParent;
-extern std::string dummyText;
 
 class ArticleTag : public AbstractBase {
 public:
@@ -96,7 +96,7 @@ public:
         return NML_TITLE;
     }
 private:
-    std::string title{dummyText};
+    std::string title{};
 };
 
 class SecTag : public AbstractBase {
@@ -120,7 +120,20 @@ public:
     void add_text(std::string const &s);
 private:
     // TODO: rework paragraph tags
-    std::string body{dummyText};
+    std::string body{};
+};
+
+class ContentDummyTag : public AbstractBase {
+public:
+    explicit ContentDummyTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_CONTENT;
+    }
+    void add_text(std::string const &s);
+private:
+    std::string text{};
 };
 
 #endif //NML_GENERATOR_H

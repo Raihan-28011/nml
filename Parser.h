@@ -22,11 +22,11 @@ private:
     void parse_title_tag(int indent, Parent parent);
     void parse_arg_tag(int indent, Parent parent);
     void parse_sec_tag(int indent, Parent parent);
-
     void parse_para_tag(int indent, Parent parent);
-    void parse_italic_tag(int indent);
-    void parse_underline_tag(int indent);
-    void parse_bold_tag(int indent);
+    void parse_content(Parent parent);
+    void parse_italic_tag(int indent, Parent parent);
+    void parse_underline_tag(int indent, Parent parent);
+    void parse_bold_tag(int indent, Parent parent);
 private:
     Lexer &lex;
     std::string out_file{};
@@ -34,9 +34,10 @@ private:
     Generator generator{};
     std::shared_ptr<AbstractBase> docRoot{};
     std::unordered_map<NmlTags, std::unordered_map<TokenType, std::string>> arguments {
-            {NML_ARTICLE,{ {TOKEN_AUTHOR, "author"},
-                                 {TOKEN_DATE, "date"}
-                                }}
+            {NML_ARTICLE, {{TOKEN_AUTHOR, "author"},
+                           {TOKEN_DATE, "date"}}},
+            {NML_SEC, {{}
+            }}
     };
 };
 

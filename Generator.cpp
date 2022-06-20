@@ -147,7 +147,7 @@ void ArticleTag::generate_styles(std::string &s) {
          "        font-size: 30px;\n"
          "    }\n"
          "\n"
-         "    .articleTitle {\n"
+         "    .Title {\n"
          "      margin-bottom: 30px;\n"
          "    }\n"
          "\n"
@@ -216,15 +216,18 @@ TitleTag::TitleTag(Parent p)
 
 void TitleTag::generate(std::string &s, long long indent) {
     auto in = std::string(indent*2, ' ');
-    s += in + "<div class=\"articleTitle\">\n";
+    s += in + "<div class=\"Title\">\n";
 
-    s += std::string((indent+1)*2, ' ') + "<h2> ";
-    s += title + " </h2>\n";
+    auto in2 = std::string((indent + 1) * 2, ' ');
+    s += in2 + "<h2>\n";
+
+    for (auto &i: childs)
+        i->generate(s, indent+1);
+
+    s += in2 + "</h2>\n";
 
     if (parent->tag_type() == NML_SEC)
-        s += "<hr>\n";
-    /*for (auto &i: childs)
-        i->generate(s, indent+1);*/
+        s += in2 + "<hr>\n";
 
     if (parent->tag_type() == NML_ARTICLE) {
         if (parent->get_option(TOKEN_AUTHOR) != "author" || parent->get_option(TOKEN_DATE) != "date") {
@@ -261,7 +264,7 @@ ParaTag::ParaTag(Parent parent)
 
 void ParaTag::generate(std::string &s, long long int indent) {
     auto in = std::string(indent*2, ' ');
-    s += in + "<p>\n" + body + " ";
+    s += in + "<p>\n";
     for (auto &i: childs)
         i->generate(s, indent+1);
 
@@ -270,4 +273,18 @@ void ParaTag::generate(std::string &s, long long int indent) {
 
 void ParaTag::add_text(const std::string &s) {
     body = s;
+}
+
+ContentDummyTag::ContentDummyTag(Parent parent)
+    : AbstractBase{parent}
+{
+}
+
+void ContentDummyTag::generate(std::string &s, long long int indent) {
+    auto in = std::string(indent*2, ' ');
+    s += in + " " + text + "\n";
+}
+
+void ContentDummyTag::add_text(const std::string &s) {
+    text = s;
 }

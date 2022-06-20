@@ -9,7 +9,7 @@ Lexer::Lexer(std::string &&file_text)
 void Lexer::tokenize() {
     skip_whitespace();
     char c = next_char();
-    while (c != std::char_traits<char>::eof()) {
+    while (not_eof(c)) {
         switch (c) {
             case '[':
                 _tokens.push_back(Token{TOKEN_LSQBRACE, "["});
@@ -61,7 +61,7 @@ char Lexer::next_char() {
 }
 
 void Lexer::skip_whitespace() {
-    while (std::isspace(peek_char()) && peek_char() != std::char_traits<char>::eof())
+    while (std::isspace(peek_char()) && not_eof(peek_char()))
         next_char();
 }
 
@@ -72,18 +72,22 @@ char Lexer::peek_char() {
 }
 
 void Lexer::extract_string(std::string &s, char c) {
-    while (c != std::char_traits<char>::eof() &&
-           c >= 0 && c <= 127 && c != '[' && c != ']' && c != ',') { // check all ascii characters
+    while (not_eof(c) && c >= 0 && c <= 127     // check all ascii characters
+            && c != '[' && c != ']' && c != ',') {
         if (c == '\\') {
             c = next_char();
-            if (c == std::char_traits<char>::eof())
+            if (!not_eof(c))
                 return;
+        }
+
+        if (std::isspace(c)) {
+            skip_whitespace();
         }
         s += c;
         c = next_char();
     }
 
-    if (c != std::char_traits<char>::eof())
+    if (not_eof(c))
         putback_char(); // we have read a character that we want to putback
 }
 
@@ -100,20 +104,23 @@ void Lexer::print() {
 }
 
 void Lexer::read_word(std::string &s, char c) {
-    while (c != std::char_traits<char>::eof() &&
-           !std::isspace(c) && c != ',' && c != '*' &&
+    while (not_eof(c) && !std::isspace(c) && c != ',' && c != '*' &&
            c != '=' && c != '[' && c != ']') {
         if (c == '\\') {
             c = next_char();
-            if (c == std::char_traits<char>::eof())
+            if (!not_eof(c))
                 return;
         }
         s += c;
         c = next_char();
     }
 
-    if (c != std::char_traits<char>::eof())
+    if (not_eof(c))
         putback_char();
+}
+
+bool Lexer::not_eof(char c) const {
+    return c != std::char_traits<char>::eof();
 }
 
 bool Lexer::check_for_tag_token(std::string &s) {

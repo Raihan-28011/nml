@@ -59,6 +59,8 @@ private:
             {"code", TOKEN_CODE},
             {"math", TOKEN_MATH},
     };
+
+    bool not_eof(char c) const;
 };
 
 
