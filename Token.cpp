@@ -24,8 +24,8 @@ void Token::print() const {
         case TOKEN_ARTICLE:
             std::cout << "TOKEN_ARTICLE";
             break;
-        case TOKEN_OPT:
-            std::cout << "TOKEN_OPT";
+        case TOKEN_ARG:
+            std::cout << "TOKEN_ARG";
             break;
         case TOKEN_TITLE:
             std::cout << "TOKEN_TITLE";
@@ -33,9 +33,9 @@ void Token::print() const {
         case TOKEN_AUTHOR:
             std::cout << "TOKEN_AUTHOR";
             break;
-        case TOKEN_AFF:
+/*        case TOKEN_AFF:
             std::cout << "TOKEN_AFF";
-            break;
+            break;*/
         case TOKEN_DATE:
             std::cout << "TOKEN_DATE";
             break;
@@ -71,6 +71,9 @@ void Token::print() const {
             break;
         case TOKEN_COMMA:
             std::cout << "TOKEN_COMMA";
+            break;
+        case TOKEN_CODE:
+            std::cout << "TOKEN_CODE";
             break;
         case TOKEN_EOF:
             std::cout << "TOKEN_EOF";

@@ -15,19 +15,28 @@ public:
 
     void parse();
 private:
-    void parse_tag(int indent);
+    void parse_tag(int indent, Parent parent);
     bool is_tag(TokenType t);
 
-    void parse_para_tag(int indent);
+    void parse_article_tag(int indent, Parent parent);
+    void parse_title_tag(int indent, Parent parent);
+    void parse_arg_tag(int indent, Parent parent);
+
+    void parse_para_tag(int indent, Parent parent);
     void parse_italic_tag(int indent);
     void parse_underline_tag(int indent);
     void parse_bold_tag(int indent);
 private:
     Lexer &lex;
-    std::string out_file;
-    std::array<void(Parser::*)(int), TOKEN_END> tag_parse_func{};
-    Generator generator;
-
+    std::string out_file{};
+    std::array<void(Parser::*)(int, Parent), TOKEN_END> tag_parse_func{};
+    Generator generator{};
+    std::unique_ptr<AbstractBase> docRoot{};
+    std::unordered_map<NmlTags, std::unordered_map<TokenType, std::string>> arguments {
+            {NML_ARTICLE,{ {TOKEN_AUTHOR, "author"},
+                                 {TOKEN_DATE, "date"}
+                                }}
+    };
 };
 
 

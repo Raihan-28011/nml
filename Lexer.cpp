@@ -103,6 +103,11 @@ void Lexer::read_word(std::string &s, char c) {
     while (c != std::char_traits<char>::eof() &&
            !std::isspace(c) && c != ',' && c != '*' &&
            c != '=' && c != '[' && c != ']') {
+        if (c == '\\') {
+            c = next_char();
+            if (c == std::char_traits<char>::eof())
+                return;
+        }
         s += c;
         c = next_char();
     }
@@ -124,4 +129,10 @@ Token const &Lexer::peek_token() {
     if (_tindex >= _tokens.size())
         return eof_token;
     return _tokens.at(_tindex);
+}
+
+Token const &Lexer::peek_next_token() {
+    if (_tindex >= _tokens.size()-1)
+        return eof_token;
+    return _tokens.at(_tindex+1);
 }

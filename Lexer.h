@@ -12,6 +12,7 @@ public:
 
     Token const &next_token();  // Parser will use this function. You have to define it
     Token const &peek_token();  // Don't increment the _tindex, just return the next token
+    Token const &peek_next_token();
     void print();  // For debugging purpose, I have defined it. You will also define it
 private:
     // Helper functions. Other class can't access these
@@ -40,21 +41,22 @@ private:
 
     Token const eof_token{TOKEN_EOF, "EOF"};
     std::unordered_map<std::string, TokenType> known_tokens {
-            {"p", TOKEN_PARA},
+            {"p",       TOKEN_PARA},
             {"article", TOKEN_ARTICLE},
-            {"opt", TOKEN_OPT},
-            {"title", TOKEN_TITLE},
-            {"author", TOKEN_AUTHOR},
-            {"aff", TOKEN_AFF},
-            {"date", TOKEN_DATE},
-            {"sec", TOKEN_SEC},
-            {"b", TOKEN_BOLD},
-            {"i", TOKEN_ITALIC},
-            {"u", TOKEN_UNDERLINE},
-            {"ul", TOKEN_ULIST},
-            {"ol", TOKEN_OLIST},
+            {"arg",     TOKEN_ARG},
+            {"title",   TOKEN_TITLE},
+            {"author",  TOKEN_AUTHOR},
+            /*{"aff", TOKEN_AFF},*/
+            {"date",    TOKEN_DATE},
+            {"sec",     TOKEN_SEC},
+            {"b",       TOKEN_BOLD},
+            {"i",       TOKEN_ITALIC},
+            {"u",       TOKEN_UNDERLINE},
+            {"ul",      TOKEN_ULIST},
+            {"ol",      TOKEN_OLIST},
             {"item", TOKEN_ITEM},
             {"style", TOKEN_STYLE},
+            {"code", TOKEN_CODE},
     };
 };
 

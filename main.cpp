@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     std::string s{};
     read(argv[1], s);
     Lexer lex(std::move(s));
-    //lex.print(); // For debug purpose
+    /*lex.print(); // For debug purpose*/
 
     Parser parser(lex, std::string{argv[1]});
     parser.parse();
