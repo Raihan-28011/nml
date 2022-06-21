@@ -80,10 +80,8 @@ void Lexer::extract_string(std::string &s, char c) {
                 return;
         }
 
-        if (std::isspace(c)) {
-            skip_whitespace();
-        }
-        s += c;
+        if (c != '\r')
+            s += c;
         c = next_char();
     }
 
@@ -124,6 +122,14 @@ bool Lexer::not_eof(char c) const {
 }
 
 bool Lexer::check_for_tag_token(std::string &s) {
+    std::string t{s.begin(), s.begin()+s.length()-1};
+    auto b = known_tokens.find(t) != known_tokens.end();
+
+    // Check if its a escaped keyword or not
+    if (b && s.back() == ':') {
+        s.pop_back();
+        return false;
+    }
     return known_tokens.find(s) != known_tokens.end();
 }
 

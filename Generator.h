@@ -44,7 +44,10 @@ enum NmlTags {
     NML_UNDERLINE,
     NML_CODE,
     NML_MATH,
-    NML_CONTENT
+    NML_CONTENT,
+    NML_ULIST,
+    NML_OLIST,
+    NML_LIST,
 };
 
 class AbstractBase;
@@ -95,8 +98,6 @@ public:
     NmlTags tag_type() override {
         return NML_TITLE;
     }
-private:
-    std::string title{};
 };
 
 class SecTag : public AbstractBase {
@@ -117,10 +118,6 @@ public:
     NmlTags tag_type() override {
         return NML_PARA;
     }
-    void add_text(std::string const &s);
-private:
-    // TODO: rework paragraph tags
-    std::string body{};
 };
 
 class ContentDummyTag : public AbstractBase {
@@ -134,6 +131,36 @@ public:
     void add_text(std::string const &s);
 private:
     std::string text{};
+};
+
+class CodeTag : public AbstractBase {
+public:
+    explicit CodeTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_CONTENT;
+    }
+};
+
+class UlistTag : public AbstractBase {
+public:
+    explicit UlistTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_ULIST;
+    }
+};
+
+class ListTag : public AbstractBase {
+public:
+    explicit ListTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_LIST;
+    }
 };
 
 #endif //NML_GENERATOR_H

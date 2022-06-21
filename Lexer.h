@@ -54,10 +54,11 @@ private:
             {"u",       TOKEN_UNDERLINE},
             {"ul",      TOKEN_ULIST},
             {"ol",      TOKEN_OLIST},
-            {"item", TOKEN_ITEM},
-            {"style", TOKEN_STYLE},
-            {"code", TOKEN_CODE},
-            {"math", TOKEN_MATH},
+            {"item",    TOKEN_ITEM},
+            {"style",   TOKEN_STYLE},
+            {"code",    TOKEN_CODE},
+            {"math",    TOKEN_MATH},
+            {"li",      TOKEN_LIST},
     };
 
     bool not_eof(char c) const;

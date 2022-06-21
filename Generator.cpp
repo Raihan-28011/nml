@@ -133,7 +133,7 @@ void ArticleTag::generate(std::string &s, long long indent) {
 void ArticleTag::generate_styles(std::string &s) {
     s += "  <style>\n";
 
-    s += ".article {\n"
+    s += "    .article {\n"
          "        width: 800px;\n"
          "        margin: auto;\n"
          "        font-family: Helvetica, Arial, sans-serif;\n"
@@ -238,10 +238,6 @@ void TitleTag::generate(std::string &s, long long indent) {
     s += in + "</div>\n";
 }
 
-void TitleTag::add_text(std::string const &s) {
-    title = s;
-}
-
 SecTag::SecTag(Parent p)
     : AbstractBase{p}
 {
@@ -271,10 +267,6 @@ void ParaTag::generate(std::string &s, long long int indent) {
     s += in + "</p>\n";
 }
 
-void ParaTag::add_text(const std::string &s) {
-    body = s;
-}
-
 ContentDummyTag::ContentDummyTag(Parent parent)
     : AbstractBase{parent}
 {
@@ -282,9 +274,53 @@ ContentDummyTag::ContentDummyTag(Parent parent)
 
 void ContentDummyTag::generate(std::string &s, long long int indent) {
     auto in = std::string(indent*2, ' ');
-    s += in + " " + text + "\n";
+    s += in + text + "\n";
 }
 
 void ContentDummyTag::add_text(const std::string &s) {
     text = s;
+}
+
+CodeTag::CodeTag(Parent parent)
+    : AbstractBase{parent}
+{
+}
+
+void CodeTag::generate(std::string &s, long long int indent) {
+    auto in = std::string(indent*2, ' ');
+    s += in + "<div class=\"codeblock\">\n"
+       + "<pre>\n";
+    for (auto &i: childs)
+        i->generate(s, 0);
+    s += "</pre>\n" + in + "</div>\n";
+}
+
+UlistTag::UlistTag(Parent parent)
+    : AbstractBase{parent}
+{
+}
+
+void UlistTag::generate(std::string &s, long long int indent) {
+    auto in = std::string(indent*2, ' ');
+    s += in + "<ul>\n";
+
+    for (auto &i: childs)
+        i->generate(s, indent+1);
+
+    s += in + "</ul>\n";
+}
+
+ListTag::ListTag(Parent parent)
+    : AbstractBase{parent}
+{
+}
+
+void ListTag::generate(std::string &s, long long int indent) {
+    auto in = std::string(indent*2, ' ');
+    s += in + "<li>\n";
+
+    for (auto &i: childs)
+        i->generate(s, indent+1);
+
+    s += in + "</li>\n";
 }
