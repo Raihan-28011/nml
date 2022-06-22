@@ -75,11 +75,10 @@ void Lexer::extract_string(std::string &s, char c) {
     while (not_eof(c) && c >= 0 && c <= 127     // check all ascii characters
             && c != '[' && c != ']' && c != ',') {
         if (c == '\\') {
+            if (peek_char() != ',')
+                s += c;
             c = next_char();
-            if (!not_eof(c))
-                return;
         }
-
         if (c != '\r')
             s += c;
         c = next_char();
@@ -105,9 +104,8 @@ void Lexer::read_word(std::string &s, char c) {
     while (not_eof(c) && !std::isspace(c) && c != ',' && c != '*' &&
            c != '=' && c != '[' && c != ']') {
         if (c == '\\') {
+            s += c;
             c = next_char();
-            if (!not_eof(c))
-                return;
         }
         s += c;
         c = next_char();
@@ -149,3 +147,29 @@ Token const &Lexer::peek_next_token() {
         return eof_token;
     return _tokens.at(_tindex+1);
 }
+
+/*bool Lexer::is_math() {
+    int count = 0;
+    if (peek_char() == '(') {
+        next_char();
+        ++count;
+        auto c = next_char();
+        while (c != '\\' && peek_char() != ')' && not_eof(c))
+            c = next_char();
+
+        if (c == '\\' && peek_char() == ')')
+            return true;
+    } else if (peek_char() == '[') {
+        next_char();
+        ++count;
+        auto c = next_char();
+        while (c != '\\' && peek_char() != ']' && not_eof(c))
+            (c = next_char()), ++count;
+
+        if (c == '\\' && peek_char() == ']')
+            return true;
+    }
+    while (count--)
+        putback_char();
+    return false;
+}*/

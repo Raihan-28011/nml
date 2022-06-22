@@ -26,6 +26,7 @@ private:
     void parse_content(Parent parent);
     void parse_code_tag(int indent, Parent parent);
     void parse_ulist_tag(int indent, Parent parent);
+    void parse_olist_tag(int indent, Parent parent);
     void parse_list_tag(int indent, Parent parent);
     void parse_italic_tag(int indent, Parent parent);
     void parse_underline_tag(int indent, Parent parent);

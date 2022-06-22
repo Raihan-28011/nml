@@ -31,6 +31,7 @@ private:
                                              // we will extract a full string.
     bool check_for_tag_token(std::string &s);  // Check if the string s is a tag name or not
     Token tag_token(std::string &s);  // Returns a tag token, after checking which tag it is
+    /*bool is_math();*/
 
 private:
     std::string _file_text;

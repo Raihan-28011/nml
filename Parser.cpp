@@ -10,6 +10,7 @@ Parser::Parser(Lexer &l, std::string s)
     tag_parse_func[TOKEN_SEC] = &Parser::parse_sec_tag;
     tag_parse_func[TOKEN_CODE] = &Parser::parse_code_tag;
     tag_parse_func[TOKEN_ULIST] = &Parser::parse_ulist_tag;
+    tag_parse_func[TOKEN_OLIST] = &Parser::parse_olist_tag;
     tag_parse_func[TOKEN_LIST] = &Parser::parse_list_tag;
     tag_parse_func[TOKEN_ITALIC] = &Parser::parse_italic_tag;
     tag_parse_func[TOKEN_BOLD] = &Parser::parse_bold_tag;
@@ -152,15 +153,102 @@ void Parser::parse_list_tag(int indent, Parent parent) {
 }
 
 void Parser::parse_underline_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
 
+    auto child = std::make_shared<UnderlineTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_STRING:
+                parse_content(child);
+                break;
+            case TOKEN_LSQBRACE:
+                lex.next_token();
+                parse_tag(indent+1, child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
 }
 
 void Parser::parse_italic_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
 
+    auto child = std::make_shared<ItalicTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_STRING:
+                parse_content(child);
+                break;
+            case TOKEN_LSQBRACE:
+                lex.next_token();
+                parse_tag(indent+1, child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
 }
 
 void Parser::parse_bold_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
 
+    auto child = std::make_shared<BoldTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_STRING:
+                parse_content(child);
+                break;
+            case TOKEN_LSQBRACE:
+                lex.next_token();
+                parse_tag(indent+1, child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
 }
 
 void Parser::parse_article_tag(int indent, Parent parent) {
@@ -329,6 +417,39 @@ void Parser::parse_code_tag(int indent, Parent parent) {
         switch (t.type()) {
             case TOKEN_STRING:
                 parse_content(child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
+}
+
+void Parser::parse_olist_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
+
+    auto child = std::make_shared<OlistTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_STRING:
+                parse_content(child);
+                break;
+            case TOKEN_LSQBRACE:
+                lex.next_token();
+                parse_tag(indent+1, child);
                 break;
             default:
                 break;

@@ -163,4 +163,44 @@ public:
     }
 };
 
+class BoldTag : public AbstractBase {
+public:
+    explicit BoldTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_BOLD;
+    }
+};
+
+class ItalicTag : public AbstractBase {
+public:
+    explicit ItalicTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_ITALIC;
+    }
+};
+
+class UnderlineTag : public AbstractBase {
+public:
+    explicit UnderlineTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_UNDERLINE;
+    }
+};
+
+class OlistTag : public AbstractBase {
+public:
+    explicit OlistTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_OLIST;
+    }
+};
+
 #endif //NML_GENERATOR_H
