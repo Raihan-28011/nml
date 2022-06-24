@@ -48,6 +48,9 @@ enum NmlTags {
     NML_ULIST,
     NML_OLIST,
     NML_LIST,
+    NML_INCODE,
+    NML_FCODE,
+    NML_LINE,
 };
 
 class AbstractBase;
@@ -69,7 +72,7 @@ public:
 protected:
     std::vector<Child> childs{};
     Parent parent;
-    std::unordered_map<TokenType, std::string> &options{dummyArgs};
+    std::unordered_map<TokenType, std::string> options{dummyArgs};
 };
 
 extern std::shared_ptr<AbstractBase> dummyParent;
@@ -139,7 +142,7 @@ public:
 
     void generate(std::string &s, long long indent) override;
     NmlTags tag_type() override {
-        return NML_CONTENT;
+        return NML_CODE;
     }
 };
 
@@ -200,6 +203,42 @@ public:
     void generate(std::string &s, long long indent) override;
     NmlTags tag_type() override {
         return NML_OLIST;
+    }
+};
+
+class InCodeTag : public AbstractBase {
+public:
+    explicit InCodeTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_INCODE;
+    }
+};
+
+class FCodeTag : public AbstractBase {
+public:
+    explicit FCodeTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    void generate_head(std::string &s, long long indent);
+    NmlTags tag_type() override {
+        return NML_FCODE;
+    }
+    int total_lines() {
+        return childs.size();
+    }
+
+    int cur_line = 1;
+};
+
+class LnTag : public AbstractBase {
+public:
+    explicit LnTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_LINE;
     }
 };
 

@@ -31,6 +31,9 @@ private:
     void parse_italic_tag(int indent, Parent parent);
     void parse_underline_tag(int indent, Parent parent);
     void parse_bold_tag(int indent, Parent parent);
+    void parse_incode_tag(int indent, Parent parent);
+    void parse_fcode_tag(int indent, Parent parent);
+    void parse_ln_tag(int indent, Parent parent);
 private:
     Lexer &lex;
     std::string out_file{};
@@ -39,9 +42,8 @@ private:
     std::shared_ptr<AbstractBase> docRoot{};
     std::unordered_map<NmlTags, std::unordered_map<TokenType, std::string>> arguments {
             {NML_ARTICLE, {{TOKEN_AUTHOR, "author"},
-                           {TOKEN_DATE, "date"}}},
-            {NML_SEC, {{}
-            }}
+                                {TOKEN_DATE, "date"}}},
+            {NML_FCODE, {{TOKEN_HEAD, ""}}}
     };
 };
 

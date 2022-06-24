@@ -31,7 +31,6 @@ private:
                                              // we will extract a full string.
     bool check_for_tag_token(std::string &s);  // Check if the string s is a tag name or not
     Token tag_token(std::string &s);  // Returns a tag token, after checking which tag it is
-    /*bool is_math();*/
 
 private:
     std::string _file_text;
@@ -58,11 +57,16 @@ private:
             {"item",    TOKEN_ITEM},
             {"style",   TOKEN_STYLE},
             {"code",    TOKEN_CODE},
-            {"math",    TOKEN_MATH},
             {"li",      TOKEN_LIST},
+            {"incode",  TOKEN_INCODE},
+            {"fcode",   TOKEN_FCODE},
+            {"head",    TOKEN_HEAD},
+            {"ln",      TOKEN_LINE},
     };
 
     bool not_eof(char c) const;
+
+    void extract_dquoted_string(std::string &s, char c);
 };
 
 

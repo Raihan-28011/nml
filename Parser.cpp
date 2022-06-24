@@ -15,6 +15,9 @@ Parser::Parser(Lexer &l, std::string s)
     tag_parse_func[TOKEN_ITALIC] = &Parser::parse_italic_tag;
     tag_parse_func[TOKEN_BOLD] = &Parser::parse_bold_tag;
     tag_parse_func[TOKEN_UNDERLINE] = &Parser::parse_underline_tag;
+    tag_parse_func[TOKEN_INCODE] = &Parser::parse_incode_tag;
+    tag_parse_func[TOKEN_FCODE] = &Parser::parse_fcode_tag;
+    tag_parse_func[TOKEN_LINE] = &Parser::parse_ln_tag;
 }
 
 
@@ -82,8 +85,8 @@ void Parser::parse_para_tag(int indent, Parent parent) {
 bool Parser::is_tag(TokenType t) {
     return (t == TOKEN_PARA || t == TOKEN_UNDERLINE || t == TOKEN_BOLD || t == TOKEN_ITALIC
             || t == TOKEN_SEC || t == TOKEN_ARG || t == TOKEN_ARTICLE || t == TOKEN_OLIST
-            || t == TOKEN_ULIST || t == TOKEN_TITLE || t == TOKEN_CODE || t == TOKEN_MATH
-            || t == TOKEN_LIST);
+            || t == TOKEN_ULIST || t == TOKEN_TITLE || t == TOKEN_CODE || t == TOKEN_LIST
+            || t == TOKEN_INCODE || t == TOKEN_FCODE || t == TOKEN_LINE);
 }
 
 void Parser::parse_ulist_tag(int indent, Parent parent) {
@@ -262,16 +265,8 @@ void Parser::parse_article_tag(int indent, Parent parent) {
     while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
         switch (t.type()) {
             case TOKEN_LSQBRACE:
-            {
-                auto p = lex.peek_next_token();
-                if (p.type() != TOKEN_TITLE && p.type() != TOKEN_ARG) {
-                    // error
-                    return;
-                }
-
                 lex.next_token();
                 parse_tag(indent + 1, docRoot);
-            }
                 break;
             default:
                 break;
@@ -332,6 +327,7 @@ void Parser::parse_arg_tag(int indent, Parent parent) {
                 break;
             case TOKEN_AUTHOR:
             case TOKEN_DATE:
+            case TOKEN_HEAD:
             {
                 lex.next_token();
                 if (lex.peek_token().type() != TOKEN_EQUAL) {
@@ -450,6 +446,97 @@ void Parser::parse_olist_tag(int indent, Parent parent) {
             case TOKEN_LSQBRACE:
                 lex.next_token();
                 parse_tag(indent+1, child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
+}
+
+void Parser::parse_incode_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
+
+    auto child = std::make_shared<InCodeTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_STRING:
+                parse_content(child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
+}
+
+void Parser::parse_fcode_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
+
+    auto child = std::make_shared<FCodeTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_STRING:
+                parse_content(child);
+                break;
+            case TOKEN_LSQBRACE:
+                lex.next_token();
+                parse_tag(indent + 1, child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
+}
+
+void Parser::parse_ln_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
+
+    auto child = std::make_shared<LnTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_STRING:
+                parse_content(child);
                 break;
             default:
                 break;
