@@ -90,6 +90,60 @@ void Token::print() const {
         case TOKEN_LIST:
             std::cout << "TOKEN_LIST";
             break;
+        case TOKEN_TABLE:
+            std::cout << "TOKEN_TABLE";
+            break;
+        case TOKEN_ROW:
+            std::cout << "TOKEN_ROW";
+            break;
+        case TOKEN_COL:
+            std::cout << "TOKEN_COL";
+            break;
+        case TOKEN_LINK:
+            std::cout << "TOKEN_LINK";
+            break;
+        case TOKEN_URL:
+            std::cout << "TOKEN_URL";
+            break;
+        case TOKEN_CITE:
+            std::cout << "TOKEN_CITE";
+            break;
+        case TOKEN_LBRACE:
+            std::cout << "TOKEN_LBRACE";
+            break;
+        case TOKEN_RBRACE:
+            std::cout << "TOKEN_RBRACE";
+            break;
+        case TOKEN_ATRATE:
+            std::cout << "TOKEN_ATRATE";
+            break;
+        case TOKEN_NAME:
+            std::cout << "TOKEN_NAME";
+            break;
+        case TOKEN_TEXT:
+            std::cout << "TOKEN_TEXT";
+            break;
+        case TOKEN_THEME:
+            std::cout << "TOKEN_THEME";
+            break;
+        case TOKEN_TICK:
+            std::cout << "TOKEN_TICK";
+            break;
+        case TOKEN_CROSS:
+            std::cout << "TOKEN_CROSS";
+            break;
+        case TOKEN_TIPS:
+            std::cout << "TOKEN_TIPS";
+            break;
+        case TOKEN_IMG:
+            std::cout << "TOKEN_IMG";
+            break;
+        case TOKEN_HEIGHT:
+            std::cout << "TOKEN_HEIGHT";
+            break;
+        case TOKEN_WIDTH:
+            std::cout << "TOKEN_WIDTH";
+            break;
         case TOKEN_EOF:
             std::cout << "TOKEN_EOF";
             break;

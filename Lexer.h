@@ -10,6 +10,7 @@ public:
     Lexer() = default;
     explicit Lexer(std::string &&file_text);
 
+    Token const &cur_token();
     Token const &next_token();  // Parser will use this function. You have to define it
     Token const &peek_token();  // Don't increment the _tindex, just return the next token
     Token const &peek_next_token();
@@ -62,6 +63,21 @@ private:
             {"fcode",   TOKEN_FCODE},
             {"head",    TOKEN_HEAD},
             {"ln",      TOKEN_LINE},
+            {"table",   TOKEN_TABLE},
+            {"row",     TOKEN_ROW},
+            {"col",     TOKEN_COL},
+            {"link",    TOKEN_LINK},
+            {"url",     TOKEN_URL},
+            {"cite",    TOKEN_CITE},
+            {"name",    TOKEN_NAME},
+            {"text",    TOKEN_TEXT},
+            {"theme",   TOKEN_THEME},
+            {"tick",    TOKEN_TICK},
+            {"cross",   TOKEN_CROSS},
+            {"tips",    TOKEN_TIPS},
+            {"img",     TOKEN_IMG},
+            {"height",  TOKEN_HEIGHT},
+            {"width",   TOKEN_WIDTH},
     };
 
     bool not_eof(char c) const;

@@ -51,6 +51,20 @@ enum NmlTags {
     NML_INCODE,
     NML_FCODE,
     NML_LINE,
+    NML_TABLE,
+    NML_ROW,
+    NML_COL,
+    NML_LINK,
+    NML_CITE,
+    NML_TIPS,
+    NML_SVG_MARK,
+    NML_IMG,
+};
+
+enum SvgTypes {
+    SVG_TICK,
+    SVG_CROSS,
+    SVG_IDEA_BULB,
 };
 
 class AbstractBase;
@@ -69,6 +83,10 @@ public:
     virtual NmlTags tag_type() = 0;
     void set_options(std::unordered_map<TokenType, std::string> &opt);
     std::string &get_option(TokenType type);
+
+
+public:
+    static std::unordered_map<SvgTypes, std::string> svgs;
 protected:
     std::vector<Child> childs{};
     Parent parent;
@@ -97,7 +115,6 @@ public:
     explicit TitleTag(Parent p);
 
     void generate(std::string &s, long long indent) override;
-    void add_text(std::string const &s);
     NmlTags tag_type() override {
         return NML_TITLE;
     }
@@ -241,5 +258,101 @@ public:
         return NML_LINE;
     }
 };
+
+class TableTag : public AbstractBase {
+public:
+    explicit TableTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_TABLE;
+    }
+
+    int total_row = 0;
+};
+
+class RowTag : public AbstractBase {
+public:
+    explicit RowTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_ROW;
+    }
+
+    int cur_row = 1;
+};
+
+class ColTag : public AbstractBase {
+public:
+    explicit ColTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_COL;
+    }
+};
+
+class LinkTag : public AbstractBase {
+public:
+    explicit LinkTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_LINK;
+    }
+};
+
+class CiteTag : public AbstractBase {
+public:
+    explicit CiteTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    void add_cite_info(int no, std::string &s);
+    NmlTags tag_type() override {
+        return NML_LINK;
+    }
+
+private:
+    int cite_no;
+    std::string cite_text;
+};
+
+class TipsTag : public AbstractBase {
+public:
+    explicit TipsTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_TIPS;
+    }
+};
+
+class SvgMarkTag : public AbstractBase {
+public:
+    SvgMarkTag(Parent parent, SvgTypes type);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_SVG_MARK;
+    }
+
+private:
+    SvgTypes type;
+};
+
+class ImgTag : public AbstractBase {
+public:
+    ImgTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_IMG;
+    }
+
+private:
+    std::string location;
+};
+
 
 #endif //NML_GENERATOR_H

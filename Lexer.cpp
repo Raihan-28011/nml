@@ -26,6 +26,15 @@ void Lexer::tokenize() {
             case ',':
                 _tokens.push_back(Token{TOKEN_COMMA, ","});
                 break;
+            case '{':
+                _tokens.push_back(Token{TOKEN_LBRACE, "{"});
+                break;
+            case '}':
+                _tokens.push_back(Token{TOKEN_RBRACE, "}"});
+                break;
+            case '@':
+                _tokens.push_back(Token{TOKEN_ATRATE, "@"});
+                break;
             default:
             {
                 std::string s = "";
@@ -73,7 +82,8 @@ char Lexer::peek_char() {
 
 void Lexer::extract_string(std::string &s, char c) {
     while (not_eof(c) && c >= 0 && c <= 127     // check all ascii characters
-            && c != '[' && c != ']' && c != ',') {
+            && c != '[' && c != ']' && c != ','
+            && c != '{' && c != '}' && c != '@') {
         if (c == '"') {
             c = next_char();
             extract_dquoted_string(s, c);
@@ -113,7 +123,7 @@ void Lexer::print() {
 
 void Lexer::read_word(std::string &s, char c) {
     while (not_eof(c) && !std::isspace(c) && c != ',' && c != '*' &&
-           c != '=' && c != '[' && c != ']') {
+           c != '=' && c != '[' && c != ']' && c != '{' && c != '}' && c != '@') {
         if (c == '"') {
             c = next_char();
             extract_dquoted_string(s, c);
@@ -182,4 +192,10 @@ Token const &Lexer::peek_next_token() {
     if (_tindex >= _tokens.size()-1)
         return eof_token;
     return _tokens.at(_tindex+1);
+}
+
+Token const &Lexer::cur_token() {
+    if (_tindex <= 0 || _tindex-1 >= _tokens.size())
+        return eof_token;
+    return _tokens.at(_tindex-1);
 }

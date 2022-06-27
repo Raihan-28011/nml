@@ -34,6 +34,15 @@ private:
     void parse_incode_tag(int indent, Parent parent);
     void parse_fcode_tag(int indent, Parent parent);
     void parse_ln_tag(int indent, Parent parent);
+    void parse_table_tag(int indent, Parent parent);
+    void parse_row_tag(int indent, Parent parent);
+    void parse_col_tag(int indent, Parent parent);
+    void parse_link_tag(int indent, Parent parent);
+    void parse_cite_tag(int indent, Parent parent);
+    void parse_citation(int indent, Parent parent);
+    void parse_svg_marks(int indent, Parent parent);
+    void parse_tips_tag(int indent, Parent parent);
+    void parse_image_tag(int indent, Parent parent);
 private:
     Lexer &lex;
     std::string out_file{};
@@ -42,9 +51,18 @@ private:
     std::shared_ptr<AbstractBase> docRoot{};
     std::unordered_map<NmlTags, std::unordered_map<TokenType, std::string>> arguments {
             {NML_ARTICLE, {{TOKEN_AUTHOR, "author"},
-                                {TOKEN_DATE, "date"}}},
-            {NML_FCODE, {{TOKEN_HEAD, ""}}}
+                                {TOKEN_DATE, "date"},
+                                {TOKEN_THEME, "light"}}},
+            {NML_FCODE, {{TOKEN_HEAD, ""}}},
+            {NML_LINK, {{TOKEN_URL, "#"}}},
+            {NML_IMG, {{TOKEN_URL, "#"},
+                             {TOKEN_HEIGHT, "16"},
+                              {TOKEN_WIDTH, "16"}}}
     };
+
+    std::unordered_map<std::string, std::pair<int, std::string>> citations {};
+
+    void reset_argument(NmlTags tags);
 };
 
 

@@ -18,6 +18,16 @@ Parser::Parser(Lexer &l, std::string s)
     tag_parse_func[TOKEN_INCODE] = &Parser::parse_incode_tag;
     tag_parse_func[TOKEN_FCODE] = &Parser::parse_fcode_tag;
     tag_parse_func[TOKEN_LINE] = &Parser::parse_ln_tag;
+    tag_parse_func[TOKEN_TABLE] = &Parser::parse_table_tag;
+    tag_parse_func[TOKEN_ROW] = &Parser::parse_row_tag;
+    tag_parse_func[TOKEN_COL] = &Parser::parse_col_tag;
+    tag_parse_func[TOKEN_LINK] = &Parser::parse_link_tag;
+    tag_parse_func[TOKEN_CITE] = &Parser::parse_cite_tag;
+    tag_parse_func[TOKEN_ATRATE] = &Parser::parse_citation;
+    tag_parse_func[TOKEN_TICK] = &Parser::parse_svg_marks;
+    tag_parse_func[TOKEN_CROSS] = &Parser::parse_svg_marks;
+    tag_parse_func[TOKEN_TIPS] = &Parser::parse_tips_tag;
+    tag_parse_func[TOKEN_IMG] = &Parser::parse_image_tag;
 }
 
 
@@ -26,6 +36,7 @@ void Parser::parse() {
     while (t.type() != TOKEN_EOF) {
         switch (t.type()) {
             case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
                 parse_tag(2, docRoot);
                 break;
             default:
@@ -63,6 +74,7 @@ void Parser::parse_para_tag(int indent, Parent parent) {
                 parse_content(child);
                 break;
             case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
                 lex.next_token();
                 parse_tag(indent+1, child);
                 break;
@@ -86,7 +98,10 @@ bool Parser::is_tag(TokenType t) {
     return (t == TOKEN_PARA || t == TOKEN_UNDERLINE || t == TOKEN_BOLD || t == TOKEN_ITALIC
             || t == TOKEN_SEC || t == TOKEN_ARG || t == TOKEN_ARTICLE || t == TOKEN_OLIST
             || t == TOKEN_ULIST || t == TOKEN_TITLE || t == TOKEN_CODE || t == TOKEN_LIST
-            || t == TOKEN_INCODE || t == TOKEN_FCODE || t == TOKEN_LINE);
+            || t == TOKEN_INCODE || t == TOKEN_FCODE || t == TOKEN_LINE || t == TOKEN_TABLE
+            || t == TOKEN_ROW || t == TOKEN_COL || t == TOKEN_LINK || t == TOKEN_CITE
+            || t == TOKEN_ATRATE || t == TOKEN_TICK || t == TOKEN_CROSS || t == TOKEN_TIPS
+            || t == TOKEN_IMG);
 }
 
 void Parser::parse_ulist_tag(int indent, Parent parent) {
@@ -103,6 +118,7 @@ void Parser::parse_ulist_tag(int indent, Parent parent) {
                 parse_content(child);
                 break;
             case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
                 lex.next_token();
                 parse_tag(indent+1, child);
                 break;
@@ -136,6 +152,7 @@ void Parser::parse_list_tag(int indent, Parent parent) {
                 parse_content(child);
                 break;
             case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
                 lex.next_token();
                 parse_tag(indent+1, child);
                 break;
@@ -169,6 +186,7 @@ void Parser::parse_underline_tag(int indent, Parent parent) {
                 parse_content(child);
                 break;
             case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
                 lex.next_token();
                 parse_tag(indent+1, child);
                 break;
@@ -202,6 +220,7 @@ void Parser::parse_italic_tag(int indent, Parent parent) {
                 parse_content(child);
                 break;
             case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
                 lex.next_token();
                 parse_tag(indent+1, child);
                 break;
@@ -235,6 +254,7 @@ void Parser::parse_bold_tag(int indent, Parent parent) {
                 parse_content(child);
                 break;
             case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
                 lex.next_token();
                 parse_tag(indent+1, child);
                 break;
@@ -265,6 +285,7 @@ void Parser::parse_article_tag(int indent, Parent parent) {
     while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
         switch (t.type()) {
             case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
                 lex.next_token();
                 parse_tag(indent + 1, docRoot);
                 break;
@@ -328,6 +349,9 @@ void Parser::parse_arg_tag(int indent, Parent parent) {
             case TOKEN_AUTHOR:
             case TOKEN_DATE:
             case TOKEN_HEAD:
+            case TOKEN_URL:
+            case TOKEN_THEME:
+            /*case TOKEN_NAME:*/
             {
                 lex.next_token();
                 if (lex.peek_token().type() != TOKEN_EQUAL) {
@@ -359,6 +383,26 @@ void Parser::parse_arg_tag(int indent, Parent parent) {
 
     lex.next_token();
     parent->set_options(arguments[p_type]);
+    reset_argument(p_type);
+}
+
+void Parser::reset_argument(NmlTags tags) {
+    auto &i = arguments[tags];
+    switch (tags) {
+        case NML_FCODE:
+            i[TOKEN_HEAD] = "";
+            break;
+        case NML_LINK:
+            i[TOKEN_URL] = "#";
+            break;
+        case NML_IMG:
+            i[TOKEN_URL] = "#";
+            i[TOKEN_HEIGHT] = "16";
+            i[TOKEN_WIDTH] = "16";
+            break;
+        default:
+            break;
+    }
 }
 
 void Parser::parse_sec_tag(int indent, Parent parent) {
@@ -375,6 +419,7 @@ void Parser::parse_sec_tag(int indent, Parent parent) {
                 parse_content(child);
                 break;
             case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
                 lex.next_token();
                 parse_tag(indent+1, child);
                 break;
@@ -444,6 +489,7 @@ void Parser::parse_olist_tag(int indent, Parent parent) {
                 parse_content(child);
                 break;
             case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
                 lex.next_token();
                 parse_tag(indent+1, child);
                 break;
@@ -506,6 +552,7 @@ void Parser::parse_fcode_tag(int indent, Parent parent) {
                 parse_content(child);
                 break;
             case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
                 lex.next_token();
                 parse_tag(indent + 1, child);
                 break;
@@ -552,4 +599,353 @@ void Parser::parse_ln_tag(int indent, Parent parent) {
 
     lex.next_token();
     parent->add_child(std::move(child));
+}
+
+void Parser::parse_table_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
+
+    auto child = std::make_shared<TableTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
+                lex.next_token();
+                parse_tag(indent, child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
+}
+
+void Parser::parse_row_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
+
+    auto child = std::make_shared<RowTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
+                lex.next_token();
+                parse_tag(indent, child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
+}
+
+void Parser::parse_col_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
+
+    auto child = std::make_shared<ColTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
+                lex.next_token();
+                parse_tag(indent, child);
+                break;
+            case TOKEN_STRING:
+                parse_content(child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
+}
+
+void Parser::parse_link_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
+
+    auto child = std::make_shared<LinkTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
+                lex.next_token();
+                parse_tag(indent, child);
+                break;
+            case TOKEN_STRING:
+                parse_content(child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
+}
+
+void Parser::parse_cite_tag(int indent, Parent parent) {
+    (void)parent;
+
+    auto t = lex.peek_token();
+    if (t.type() != TOKEN_NAME) {
+        // Error
+    }
+
+    t = lex.next_token();
+    if (lex.peek_token().type() != TOKEN_EQUAL) {
+        // Error
+    }
+
+    t = lex.next_token();
+    if (lex.peek_token().type() != TOKEN_STRING) {
+        // Error
+    }
+
+    auto name = lex.next_token().tok_text();
+    if (lex.peek_token().type() != TOKEN_COMMA) {
+        // Error
+    }
+
+    t = lex.next_token();
+    if (lex.peek_token().type() != TOKEN_TEXT) {
+        // Error
+    }
+
+    t = lex.next_token();
+    if (lex.peek_token().type() != TOKEN_EQUAL) {
+        // Error
+    }
+
+    t = lex.next_token();
+    if (lex.peek_token().type() != TOKEN_STRING) {
+        // Error
+    }
+
+    t = lex.next_token();
+    citations[name] = std::make_pair(citations.size()+1, t.tok_text());
+
+    t = lex.peek_token();
+    if (t.type() == TOKEN_EOF || t.type() != TOKEN_RSQBRACE) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+}
+
+void Parser::parse_citation(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
+
+    auto child = std::make_shared<CiteTag>(parent);
+    auto t = lex.peek_token();
+    if (t.type() != TOKEN_STRING) {
+        // Error
+    }
+
+    lex.next_token();
+    if (citations.find(t.tok_text()) != citations.end()) {
+        // Error
+    }
+
+    // TODO: check for invalid citations name
+
+    auto &p = citations[t.tok_text()];
+    child->add_cite_info(p.first, p.second);
+
+    t = lex.peek_token();
+    if (t.type() == TOKEN_EOF || t.type() != TOKEN_RBRACE) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
+}
+
+void Parser::parse_svg_marks(int indent, Parent parent) {
+    if (!parent) {
+        // Error
+        return;
+    }
+
+    auto t = lex.cur_token();
+    switch (t.type()) {
+        case TOKEN_CROSS:
+            parent->add_child(std::move(std::make_shared<SvgMarkTag>(parent, SVG_CROSS)));
+            break;
+        case TOKEN_TICK:
+            parent->add_child(std::move(std::make_shared<SvgMarkTag>(parent, SVG_TICK)));
+            break;
+        default:
+            // Error;
+            break;
+    }
+
+    t = lex.peek_token();
+    if (t.type() == TOKEN_EOF || t.type() != TOKEN_RSQBRACE) {
+        // Error
+    }
+    lex.next_token();
+}
+
+void Parser::parse_tips_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
+
+    auto child = std::make_shared<TipsTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
+                lex.next_token();
+                parse_tag(indent, child);
+                break;
+            case TOKEN_STRING:
+                parse_content(child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
+}
+
+void Parser::parse_image_tag(int indent, Parent parent) {
+    (void)parent;
+
+    auto t = lex.peek_token();
+    if (t.type() != TOKEN_URL) {
+        // Error
+    }
+
+    t = lex.next_token();
+    if (lex.peek_token().type() != TOKEN_EQUAL) {
+        // Error
+    }
+
+    t = lex.next_token();
+    if (lex.peek_token().type() != TOKEN_STRING) {
+        // Error
+    }
+
+    auto location = lex.next_token().tok_text();
+    auto ht = arguments[NML_IMG][TOKEN_HEIGHT];
+    auto wd = arguments[NML_IMG][TOKEN_WIDTH];
+    if (lex.peek_token().type() == TOKEN_COMMA) {
+        lex.next_token();
+        if (lex.peek_token().type() != TOKEN_HEIGHT) {
+            // Error
+        }
+
+        t = lex.next_token();
+        if (lex.peek_token().type() != TOKEN_EQUAL) {
+            // Error
+        }
+
+        t = lex.next_token();
+        if (lex.peek_token().type() != TOKEN_STRING) {
+            // Error
+        }
+
+        ht = lex.next_token().tok_text();
+    }
+
+    if (lex.peek_token().type() == TOKEN_COMMA) {
+        lex.next_token();
+        if (lex.peek_token().type() != TOKEN_WIDTH) {
+            // Error
+        }
+
+        t = lex.next_token();
+        if (lex.peek_token().type() != TOKEN_EQUAL) {
+            // Error
+        }
+
+        t = lex.next_token();
+        if (lex.peek_token().type() != TOKEN_STRING) {
+            // Error
+        }
+        wd = lex.next_token().tok_text();
+    }
+
+
+    arguments[NML_IMG][TOKEN_URL] = location;
+    arguments[NML_IMG][TOKEN_HEIGHT] = ht;
+    arguments[NML_IMG][TOKEN_WIDTH] = wd;
+
+    auto child = std::make_shared<ImgTag>(parent);
+    child->set_options(arguments[NML_IMG]);
+
+    t = lex.peek_token();
+    if (t.type() == TOKEN_EOF || t.type() != TOKEN_RSQBRACE) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(child);
+    reset_argument(NML_IMG);
 }
