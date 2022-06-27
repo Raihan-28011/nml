@@ -52,6 +52,7 @@ void Lexer::tokenize() {
 
         skip_whitespace();
         c = next_char();
+        last_token_was_string = false;
     }
 
     _tokens.push_back(eof_token);
@@ -142,6 +143,7 @@ void Lexer::read_word(std::string &s, char c) {
 }
 
 void Lexer::extract_dquoted_string(std::string &s, char c) {
+    last_token_was_string = true;
     while (not_eof(c) && c != '"') {
         if (c == '\\' && peek_char() == '"') {
             c = next_char();
@@ -164,17 +166,8 @@ bool Lexer::not_eof(char c) const {
 }
 
 bool Lexer::check_for_tag_token(std::string &s) {
-    if (s.length() > 0) {
-        std::string t{s.begin(), s.begin() + s.length() - 1};
-        auto b = known_tokens.find(t) != known_tokens.end();
-
-        // Check if its a escaped keyword or not
-        if (b && s.back() == ':') {
-            s.pop_back();
-            return false;
-        }
-    }
-    return known_tokens.find(s) != known_tokens.end();
+    return known_tokens.find(s) != known_tokens.end()
+           && !last_token_was_string;
 }
 
 Token Lexer::tag_token(std::string &s) {

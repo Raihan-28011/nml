@@ -41,6 +41,7 @@ private:
     std::vector<Token>::size_type _tindex{0};  // Index for _tokens
 
     Token const eof_token{TOKEN_EOF, "EOF"};
+    bool last_token_was_string = false;
     std::unordered_map<std::string, TokenType> known_tokens {
             {"p",       TOKEN_PARA},
             {"article", TOKEN_ARTICLE},

@@ -209,7 +209,7 @@ void ArticleTag::generate_styles(std::string &s) {
          "    }\n"
          "\n"
          "    .article {\n"
-         "        width: 800px;\n"
+         "        width: 900px;\n"
          "        margin: auto;\n"
          "        font-family: Helvetica, Arial, sans-serif;\n"
          "        line-height: 20px;\n"
@@ -278,13 +278,8 @@ void ArticleTag::generate_styles(std::string &s) {
          "      border: 1px solid  var(--codeblock-border-color);\n"
          "      border-radius: 3px;\n"
          "      overflow: auto;\n"
-         "    }\n"
-         "\n"
-         "    .inCodeblock pre {\n"
-         "      display: inline-block;\n"
-         "      margin: 0px;\n"
-         "      padding: 0px;\n"
-         "      align-items: left;\n"
+/*         "      word-wrap: nowrap;\n"
+         "      display: inline-block;\n"*/
          "    }\n"
          "\n"
          "    .section li {\n"
@@ -365,7 +360,6 @@ void ArticleTag::generate_styles(std::string &s) {
          "      margin-bottom: 20px;\n"
          "      width: 100%;\n"
          "      table-layout: fixed;\n"
-         "      /* box-shadow: 0px 0px 0px 1px var(--table-border); */\n"
          "    }\n"
          "\n"
          "    .tables .trow {\n"
@@ -374,24 +368,27 @@ void ArticleTag::generate_styles(std::string &s) {
          "    }\n"
          "\n"
          "    .trow .tcol {\n"
+         "      font-size: 13px;\n"
          "      width: 100%;\n"
          "      border-left: 1px solid var(--table-border);\n"
-         "      white-space: nowrap;\n"
-         "      overflow-x: auto;\n"
+/*         "      white-space: nowrap;\n"
+         "      overflow-x: auto;\n"*/
          "    }\n"
          "\n"
          "    .trow .thcol {\n"
+         "      font-size: 14px;\n"
          "      width: 100%;\n"
          "      border-left: 1px solid var(--table-border);\n"
          "      background-color: var(--table-header-bg);\n"
-         "      white-space: nowrap;\n"
-         "      overflow-x: auto;\n"
+/*         "      white-space: nowrap;\n"
+         "      overflow-x: auto;\n"*/
          "      font-weight: bold;\n"
          "    }\n"
          "\n"
          "    .trow .tcol, .trow .thcol {\n"
          "      padding: 5px 15px;\n"
          "      text-align: left;\n"
+         "      word-wrap: break-word;\n"
          "    }\n"
          "\n"
          "    a, a:link, a:visited {\n"
@@ -532,7 +529,7 @@ ContentDummyTag::ContentDummyTag(Parent parent)
 
 void ContentDummyTag::generate(std::string &s, long long int indent) {
     auto in = std::string(indent*2, ' ');
-    s += in + text + "\n";
+    s += in + text;
 }
 
 void ContentDummyTag::add_text(const std::string &s) {
@@ -650,11 +647,10 @@ InCodeTag::InCodeTag(Parent parent)
 
 void InCodeTag::generate(std::string &s, long long int indent) {
     auto in = std::string(indent*2, ' ');
-    s += in + "<span class=\"inCodeblock\">\n"
-         + "<pre>\n";
+    s += in + "<span class=\"inCodeblock\">";
     for (auto &i: childs)
         i->generate(s, 0);
-    s += "</pre>\n" + in + "</span>\n";
+    s += "</span>\n";
 }
 
 FCodeTag::FCodeTag(Parent parent)

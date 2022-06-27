@@ -289,6 +289,9 @@ void Parser::parse_article_tag(int indent, Parent parent) {
                 lex.next_token();
                 parse_tag(indent + 1, docRoot);
                 break;
+            case TOKEN_STRING:
+                parse_content(docRoot);
+                break;
             default:
                 break;
         }
@@ -310,27 +313,26 @@ void Parser::parse_title_tag(int indent, Parent parent) {
         return;
     }
 
-    auto child = std::make_shared<TitleTag>(parent);
     auto t = lex.peek_token();
-    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
-        switch (t.type()) {
-            case TOKEN_STRING:
-                parse_content(child);
-                break;
-            default:
-                break;
-        }
-
-        t = lex.peek_token();
+    if (t.type() != TOKEN_STRING) {
+        // Error
     }
 
-    if (t.type() == TOKEN_EOF) {
+    if (!t.tok_text().empty()) {
+        auto child = std::make_shared<TitleTag>(parent);
+        parse_content(child);
+        parent->add_child(std::move(child));
+    } else {
+        lex.next_token();
+    }
+
+    t = lex.peek_token();
+    if (t.type() == TOKEN_EOF || t.type() != TOKEN_RSQBRACE) {
         // error
         return;
     }
 
     lex.next_token();
-    parent->add_child(std::move(child));
 }
 
 void Parser::parse_arg_tag(int indent, Parent parent) {
@@ -389,6 +391,11 @@ void Parser::parse_arg_tag(int indent, Parent parent) {
 void Parser::reset_argument(NmlTags tags) {
     auto &i = arguments[tags];
     switch (tags) {
+        case NML_ARTICLE:
+            i[TOKEN_AUTHOR] = "author";
+            i[TOKEN_DATE] = "date";
+            i[TOKEN_THEME] = "light";
+            break;
         case NML_FCODE:
             i[TOKEN_HEAD] = "";
             break;
