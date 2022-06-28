@@ -28,6 +28,8 @@ Parser::Parser(Lexer &l, std::string s)
     tag_parse_func[TOKEN_CROSS] = &Parser::parse_svg_marks;
     tag_parse_func[TOKEN_TIPS] = &Parser::parse_tips_tag;
     tag_parse_func[TOKEN_IMG] = &Parser::parse_image_tag;
+    tag_parse_func[TOKEN_NOTES] = &Parser::parse_notes_tag;
+    tag_parse_func[TOKEN_WARNING] = &Parser::parse_warning_tag;
 }
 
 
@@ -101,7 +103,7 @@ bool Parser::is_tag(TokenType t) {
             || t == TOKEN_INCODE || t == TOKEN_FCODE || t == TOKEN_LINE || t == TOKEN_TABLE
             || t == TOKEN_ROW || t == TOKEN_COL || t == TOKEN_LINK || t == TOKEN_CITE
             || t == TOKEN_ATRATE || t == TOKEN_TICK || t == TOKEN_CROSS || t == TOKEN_TIPS
-            || t == TOKEN_IMG);
+            || t == TOKEN_IMG || t == TOKEN_NOTES || t == TOKEN_WARNING);
 }
 
 void Parser::parse_ulist_tag(int indent, Parent parent) {
@@ -955,4 +957,72 @@ void Parser::parse_image_tag(int indent, Parent parent) {
     lex.next_token();
     parent->add_child(child);
     reset_argument(NML_IMG);
+}
+
+void Parser::parse_notes_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
+
+    auto child = std::make_shared<NotesTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
+                lex.next_token();
+                parse_tag(indent, child);
+                break;
+            case TOKEN_STRING:
+                parse_content(child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
+}
+
+void Parser::parse_warning_tag(int indent, Parent parent) {
+    if (!parent) {
+        //error
+        return;
+    }
+
+    auto child = std::make_shared<WarningTag>(parent);
+    auto t = lex.peek_token();
+    while (t.type() != TOKEN_EOF && t.type() != TOKEN_RSQBRACE) {
+        switch (t.type()) {
+            case TOKEN_LSQBRACE:
+            case TOKEN_LBRACE:
+                lex.next_token();
+                parse_tag(indent, child);
+                break;
+            case TOKEN_STRING:
+                parse_content(child);
+                break;
+            default:
+                break;
+        }
+
+        t = lex.peek_token();
+    }
+
+    if (t.type() == TOKEN_EOF) {
+        // error
+        return;
+    }
+
+    lex.next_token();
+    parent->add_child(std::move(child));
 }

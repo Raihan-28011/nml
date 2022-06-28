@@ -59,12 +59,16 @@ enum NmlTags {
     NML_TIPS,
     NML_SVG_MARK,
     NML_IMG,
+    NML_NOTES,
+    NML_WARNING,
 };
 
 enum SvgTypes {
     SVG_TICK,
     SVG_CROSS,
     SVG_IDEA_BULB,
+    SVG_INFO,
+    SVG_WARNING
 };
 
 class AbstractBase;
@@ -352,6 +356,26 @@ public:
 
 private:
     std::string location;
+};
+
+class NotesTag : public AbstractBase {
+public:
+    explicit NotesTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_TIPS;
+    }
+};
+
+class WarningTag : public AbstractBase {
+public:
+    explicit WarningTag(Parent parent);
+
+    void generate(std::string &s, long long indent) override;
+    NmlTags tag_type() override {
+        return NML_TIPS;
+    }
 };
 
 

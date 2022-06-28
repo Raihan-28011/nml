@@ -79,6 +79,8 @@ private:
             {"img",     TOKEN_IMG},
             {"height",  TOKEN_HEIGHT},
             {"width",   TOKEN_WIDTH},
+            {"notes",   TOKEN_NOTES},
+            {"warnings",   TOKEN_WARNING},
     };
 
     bool not_eof(char c) const;

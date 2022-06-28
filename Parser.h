@@ -42,6 +42,8 @@ private:
     void parse_citation(int indent, Parent parent);
     void parse_svg_marks(int indent, Parent parent);
     void parse_tips_tag(int indent, Parent parent);
+    void parse_notes_tag(int indent, Parent parent);
+    void parse_warning_tag(int indent, Parent parent);
     void parse_image_tag(int indent, Parent parent);
 private:
     Lexer &lex;

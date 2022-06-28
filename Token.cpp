@@ -144,6 +144,12 @@ void Token::print() const {
         case TOKEN_WIDTH:
             std::cout << "TOKEN_WIDTH";
             break;
+        case TOKEN_NOTES:
+            std::cout << "TOKEN_NOTES";
+            break;
+        case TOKEN_WARNING:
+            std::cout << "TOKEN_WARNING";
+            break;
         case TOKEN_EOF:
             std::cout << "TOKEN_EOF";
             break;
